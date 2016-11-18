@@ -19,6 +19,15 @@ class KnightPathFinder
   end
 
   def build_move_tree
+    queue = [self]
+    until queue.empty?
+      current_node = queue.shift
+      current_pos = current_node.pos
+      new_move_positions(current_pos).each do |move_pos|
+        new_node = KnightPathFinder.new(move_pos)
+        current_node.possible_pos << new_node
+        queue << new_node unless queue.include?(new_node)
+    end
   end
 
   def valid_moves(pos)
