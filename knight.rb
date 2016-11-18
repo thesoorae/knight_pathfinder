@@ -1,10 +1,16 @@
-class KnightPathFinder
-  def initialize(pos)
-    @pos = pos
-    @visited_positions = [pos]
-    @start_pos = pos
-    @possible_pos = []
+require 'byebug'
+require_relative '00_tree_node.rb'
+class Knight
+
+attr_accessor :position, :visited_positions, :possible_pos, :parent
+
+  def initialize(pos, size=8)
+    @position = pos
+    @visited_positions = []
+    @size = size
+    @visited_nodes = []
   end
+
 
   def new_move_positions(pos)
     new_moves = valid_moves(pos)
@@ -18,17 +24,73 @@ class KnightPathFinder
     new_moves
   end
 
+
   def build_move_tree
-    queue = [self]
+    #debugger
+    current_node = PolyTreeNode.new(position)
+    current_moves = [position]
+    until current_moves.empty?
+      new_current_moves = []
+      current_moves.each do |current_move|
+        valid_moves(current_move).each do |possible_move|
+          next if @visited_positions.include?(possible_move)
+          new_current_moves << possible_move
+          @visited_positions << possible_move
+          new_node = PolyTreeNode.new(possible_move)
+          @visited_nodes << new_node
+          current_node.add_child(new_node)
+          current_node = new_node
+          p "#{new_node.value} parent:#{new_node.parent}"#{}" kids: #{new_no.children}"
+        end
+      end
+      current_moves = new_current_moves
+    end
+
+
+
+  end
+
+  def find_path(end_pos)
+    build_move_tree
+    visited_positions
+
+
+  end
+
+
+  def frownyface
+   #debugger
+
+    queue = [PolyTreeNode.new(position)]
     until queue.empty?
       current_node = queue.shift
-      current_pos = current_node.pos
+      current_pos = current_node.value
       new_move_positions(current_pos).each do |move_pos|
-        new_node = KnightPathFinder.new(move_pos)
-        current_node.possible_pos << new_node
+        new_node = PolyTreeNode.new(move_pos)
+        new_node.parent = current_node
         queue << new_node unless queue.include?(new_node)
+        p "pos: #{new_node.value} parent: #{new_node.parent.value}"
+      end
     end
   end
+
+
+  # def build_move_tree
+  #  #debugger
+  #
+  #   queue = [self]
+  #   until queue.empty?
+  #
+  #     current_node = queue.shift
+  #     current_pos = current_node.position
+  #     new_move_positions(current_pos).each do |move_pos|
+  #       new_node = Knight.new(move_pos,@size)
+  #       current_node.add_pos(new_node) unless @visited_positions.include?(move_pos)
+  #       queue << new_node unless queue.include?(new_node)
+  #       p new_node
+  #     end
+  #   end
+  # end
 
   def valid_moves(pos)
     valid_moves = []
@@ -52,8 +114,23 @@ class KnightPathFinder
 
   def inbounds?(pos)
     x,y = pos
-    x.between?(0,8) && y.between?(0,8)
+    x.between?(0,@size) && y.between?(0,@size)
   end
 
+  # def parent=(node)
+  #   if @parent
+  #     old_parent = @parent
+  #     old_parent.possible_pos.delete(self)
+  #   end
+  #   @parent = node
+  #   unless @parent.nil? || @parent.possible_pos.include?(self)
+  #     @parent.possible_pos << self
+  #   end
+  # end
 
+  # def add_pos(node)
+  #   @possible_pos << node
+  #   node.parent = self
+  #   node.visited_positions += @visited_positions
+  # end
 end
