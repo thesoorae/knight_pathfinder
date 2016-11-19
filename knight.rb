@@ -2,13 +2,14 @@ require 'byebug'
 require_relative '00_tree_node.rb'
 class Knight
 
-attr_accessor :position, :visited_positions, :possible_pos, :parent
+attr_accessor :position, :visited_positions, :possible_pos, :parent, :root_node, :visited_nodes
 
   def initialize(pos, size=8)
     @position = pos
     @visited_positions = []
     @size = size
     @visited_nodes = []
+    @root_node = PolyTreeNode.new(position)
   end
 
 
@@ -27,7 +28,7 @@ attr_accessor :position, :visited_positions, :possible_pos, :parent
 
   def build_move_tree
     #debugger
-    current_node = PolyTreeNode.new(position)
+    current_node =  PolyTreeNode.new(position)
     current_moves = [position]
     until current_moves.empty?
       new_current_moves = []
@@ -40,21 +41,24 @@ attr_accessor :position, :visited_positions, :possible_pos, :parent
           @visited_nodes << new_node
           current_node.add_child(new_node)
           current_node = new_node
-          p "#{new_node.value} parent:#{new_node.parent}"#{}" kids: #{new_no.children}"
+        #  p "#{new_node.value} parent:#{new_node.parent}"#{}" kids: #{new_no.children}"
+#        p visited_nodes
         end
       end
       current_moves = new_current_moves
     end
-
-
-
   end
 
-  def find_path(end_pos)
-    build_move_tree
-    visited_positions
-
-
+  def find_path(end_pos, node=root_node)
+    queue = [position]
+    path = []
+    return [end_pos] if node.value == end_pos
+    visited_nodes.each do |node|
+      node.children.each do |child|
+        path + find_path(child.value, child)
+      end
+    end
+    path
   end
 
 
