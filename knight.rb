@@ -28,11 +28,12 @@ attr_accessor :position, :visited_positions, :possible_pos, :parent, :root_node,
 
   def build_move_tree
     #debugger
-    current_node =  PolyTreeNode.new(position)
+    current_node =  root_node
     current_moves = [position]
     until current_moves.empty?
       new_current_moves = []
       current_moves.each do |current_move|
+        current_node = PolyTreeNode.new(current_move)
         valid_moves(current_move).each do |possible_move|
           next if @visited_positions.include?(possible_move)
           new_current_moves << possible_move
@@ -40,7 +41,6 @@ attr_accessor :position, :visited_positions, :possible_pos, :parent, :root_node,
           new_node = PolyTreeNode.new(possible_move)
           @visited_nodes << new_node
           current_node.add_child(new_node)
-          current_node = new_node
         #  p "#{new_node.value} parent:#{new_node.parent}"#{}" kids: #{new_no.children}"
 #        p visited_nodes
         end
@@ -49,17 +49,35 @@ attr_accessor :position, :visited_positions, :possible_pos, :parent, :root_node,
     end
   end
 
-  def find_path(end_pos, node=root_node)
-    queue = [position]
-    path = []
-    return [end_pos] if node.value == end_pos
-    visited_nodes.each do |node|
-      node.children.each do |child|
-        path + find_path(child.value, child)
-      end
+  
+  #
+  # def find_path(end_pos, node=root_node)
+  #   queue = [position]
+  #   path = []
+  #   return [end_pos] if node.value == end_pos
+  #   visited_nodes.each do |node|
+  #     node.children.each do |child|
+  #       current_result = find_path(end_pos, child)
+  #       return current_result if current_result
+  #     end
+  #     nil
+  #     end
+  #
+  # end
+
+def find_path(target)
+   queue = [root_node]
+  until queue.empty?
+    p current_node = queue.shift
+    p queue
+    return current_node if current_node.value == target
+    current_node.children.each do |child|
+      queue << child
     end
-    path
   end
+  nil
+end
+
 
 
   def frownyface
